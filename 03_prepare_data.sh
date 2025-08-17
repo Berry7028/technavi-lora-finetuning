@@ -1,18 +1,18 @@
 #!/bin/bash
 echo "================================================"
-echo "Step 3: Preparing TechNavi-style training data"
+echo "ステップ3: トレーニングデータを準備中"
 echo "================================================"
 
-echo "Creating data directory..."
-mkdir -p data
-
-echo "Data files are already prepared in the data/ directory:"
-echo "- data/train.jsonl (20 training examples)"
-echo "- data/valid.jsonl (5 validation examples)"
+echo "データディレクトリを確認中..."
+if [ -d "data" ]; then
+    echo "✅ データディレクトリが存在します"
+    echo "✅ train.jsonl: $(wc -l < data/train.jsonl) 行"
+    echo "✅ valid.jsonl: $(wc -l < data/valid.jsonl) 行"
+else
+    echo "❌ データディレクトリが見つかりません"
+    exit 1
+fi
 
 echo ""
-echo "Sample training data:"
-head -n 1 data/train.jsonl | python -m json.tool
-
-echo ""
-echo "Data preparation complete!"
+echo "データ準備完了！"
+echo "TechNavi YouTubeチャンネルに関する52のトレーニング例が利用可能です。"

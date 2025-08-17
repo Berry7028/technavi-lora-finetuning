@@ -1,14 +1,15 @@
 #!/bin/bash
 echo "================================================"
-echo "Step 2: Installing MLX-LM with GPT-OSS LoRA fix"
+echo "ステップ2: MLXをインストール中"
 echo "================================================"
 
 source venv/bin/activate
 
-echo "Installing MLX-LM from GitHub (includes GPT-OSS LoRA nan fix)..."
-pip install git+https://github.com/ml-explore/mlx-lm.git
+echo "pipをアップグレード中..."
+pip install --upgrade pip
 
-echo ""
-echo "MLX-LM installation complete!"
-echo "Verifying installation..."
-python -c "import mlx_lm; print(f'MLX-LM version: {mlx_lm.__version__}')"
+echo "MLX-LMをインストール中..."
+pip install mlx-lm
+
+echo "MLX-LMのインストール完了！"
+echo "Apple Siliconで最適化された機械学習フレームワークが利用可能になりました。"

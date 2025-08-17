@@ -1,43 +1,52 @@
-# TechNavi LoRA Fine-tuning
+# TechNavi LoRA ファインチューニング
 
-Fine-tune GPT-OSS-20B with TechNavi YouTube channel knowledge using LoRA on Apple Silicon.
+Apple SiliconでLoRAを使用してTechNavi YouTubeチャンネルの知識でGemma-3-270m-itをファインチューニングします。
 
-## Quick Start
+## クイックスタート
 
-Run the complete demo:
+完全なデモを実行:
 ```bash
 ./run_full_demo.sh
 ```
 
-Or run steps individually:
+または個別にステップを実行:
 ```bash
-# 1. Setup
+# 1. セットアップ
 ./01_setup_environment.sh && source venv/bin/activate
 
-# 2. Install MLX
+# 2. MLXのインストール
 ./02_install_mlx.sh
 
-# 3. Train LoRA
+# 3. LoRAトレーニング
 ./04_run_lora_training.sh
 
-# 4. Test model
-python inference.py --adapter-path ./gpt_oss_lora_adapter --prompt "What is TechNavi?"
+# 4. モデルのテスト
+python inference.py --adapter-path ./gemma_3_lora_adapter --prompt "What is TechNavi?"
 
-# 5. Compare base vs LoRA
+# 5. ベースモデルとLoRAの比較
 ./08_compare_lora_inference.sh
 ```
 
-## What it does
+## 何をするか
 
-- **Before**: Generic model with no TechNavi knowledge
-- **After**: Model knows TechNavi is a YouTube channel with reasoning capabilities
+- **前**: TechNaviの知識がない一般的なGemma-3モデル
+- **後**: TechNaviがYouTubeチャンネルであることを知り、推論能力を持つモデル
 
-## Key Features
+## 主な機能
 
-- ✅ Performance statistics (tokens/sec, memory usage)
-- ✅ Base vs LoRA comparison
-- ✅ Interactive mode
+- ✅ 性能統計 (トークン/秒、メモリ使用量)
+- ✅ ベースモデルとLoRAの比較
+- ✅ インタラクティブモード
+- ✅ Gemma-3-270m-itモデルに最適化
 
-## Training Data
+## トレーニングデータ
 
-52 examples about TechNavi YouTube channel with reasoning patterns.
+推論パターンを含むTechNavi YouTubeチャンネルに関する52の例。
+
+## モデル仕様
+
+- **ベースモデル**: `lmstudio-community/gemma-3-270m-it-MLX-8bit`
+- **モデルサイズ**: 270Mパラメータ
+- **量子化**: 8-bit
+- **フレームワーク**: MLX (Apple Silicon最適化)
+- **トレーニング**: 効率性のためのLoRAファインチューニング

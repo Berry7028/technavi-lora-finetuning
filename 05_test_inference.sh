@@ -1,18 +1,19 @@
 #!/bin/bash
 echo "================================================"
-echo "Step 5: Testing inference with fine-tuned model"
+echo "ステップ5: LoRAアダプター付きGemma-3-270m-itをテスト中"
 echo "================================================"
 
 source venv/bin/activate
 
-echo "Testing with a single TechNavi-style prompt..."
-echo ""
+MODEL="lmstudio-community/gemma-3-270m-it-MLX-8bit"
+ADAPTER_PATH="./gemma_3_lora_adapter"
 
-python inference.py --adapter-path ./gpt_oss_lora_adapter --prompt "What is Technavi?" --max-tokens 150 --verbose
+echo "アダプターなしのベースモデルをテスト中..."
+python inference.py --base-model $MODEL --prompt "What is TechNavi?"
 
 echo ""
-echo "To test with all prompts, run:"
-echo "python inference.py --test-all"
+echo "LoRAアダプター付きモデルをテスト中..."
+python inference.py --base-model $MODEL --adapter-path $ADAPTER_PATH --prompt "What is TechNavi?"
+
 echo ""
-echo "For interactive mode, run:"
-echo "python inference.py --interactive"
+echo "テスト完了！上記の応答を比較してください。"

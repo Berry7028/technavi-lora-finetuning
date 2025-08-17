@@ -5,25 +5,26 @@ import argparse
 import json
 
 def load_model_with_lora(base_model_path, adapter_path=None):
-    print(f"Loading base model: {base_model_path}")
+    print(f"ベースモデルを読み込み中: {base_model_path}")
     if adapter_path:
         model, tokenizer = load(base_model_path, adapter_path=adapter_path)
-        print(f"Loaded model with LoRA adapter from: {adapter_path}")
+        print(f"LoRAアダプター付きモデルを読み込みました: {adapter_path}")
     else:
         model, tokenizer = load(base_model_path)
-        print(f"Loaded base model without adapter")
+        print(f"アダプターなしのベースモデルを読み込みました")
     return model, tokenizer
 
 def generate_response(model, tokenizer, prompt, max_tokens=200, verbose=False, show_reasoning=True):
-    formatted_prompt = f"User: {prompt}\nAssistant:"
+    # Gemma-3は異なるプロンプトフォーマットを使用
+    formatted_prompt = f"<start_of_turn>user\n{prompt}<end_of_turn>\n<start_of_turn>model\n"
     
     print(f"\n{'='*60}")
-    print(f"Prompt: {prompt}")
+    print(f"プロンプト: {prompt}")
     print(f"{'='*60}")
     
     if verbose:
-        print("\n[GENERATION TOKENS - VERBOSE MODE]")
-        print("Generating response token by token...\n")
+        print("\n[トークン生成 - 詳細モード]")
+        print("トークンごとに応答を生成中...\n")
     
     response = generate(
         model, 
@@ -33,27 +34,31 @@ def generate_response(model, tokenizer, prompt, max_tokens=200, verbose=False, s
         verbose=verbose
     )
     
-    assistant_response = response.split("Assistant:")[-1].strip()
+    # Gemma-3フォーマットからモデルの応答を抽出
+    if "<start_of_turn>model\n" in response:
+        assistant_response = response.split("<start_of_turn>model\n")[-1].strip()
+    else:
+        assistant_response = response.strip()
     
-    # Parse reasoning if present
+    # 推論が含まれている場合は解析
     if show_reasoning and "<thinking>" in assistant_response:
         parts = assistant_response.split("</thinking>")
         if len(parts) >= 2:
             reasoning = parts[0].replace("<thinking>", "").strip()
             actual_response = parts[1].strip()
             
-            print(f"\n[REASONING/THINKING]")
+            print(f"\n[推論/思考プロセス]")
             print(f"{reasoning}")
-            print(f"\n[RESPONSE]")
+            print(f"\n[応答]")
             print(f"{actual_response}")
         else:
-            print(f"\n[RESPONSE]")
+            print(f"\n[応答]")
             print(f"{assistant_response}")
     else:
         if not verbose:
-            print(f"Response: {assistant_response}")
+            print(f"応答: {assistant_response}")
         else:
-            print(f"\n[FINAL RESPONSE]")
+            print(f"\n[最終応答]")
             print(f"{assistant_response}")
     
     print(f"{'='*60}\n")
@@ -73,50 +78,50 @@ def test_technavi_prompts(model, tokenizer):
     ]
     
     print("\n" + "="*60)
-    print("TESTING FINE-TUNED MODEL WITH TECHNAVI-STYLE PROMPTS")
+    print("TechNaviスタイルのプロンプトでファインチューニングされたモデルをテスト中")
     print("="*60)
     
     for i, prompt in enumerate(test_prompts, 1):
-        print(f"\nTest {i}/{len(test_prompts)}:")
+        print(f"\nテスト {i}/{len(test_prompts)}:")
         generate_response(model, tokenizer, prompt, max_tokens=150, verbose=False)
 
 def interactive_mode(model, tokenizer, verbose=False, show_reasoning=True):
     print("\n" + "="*60)
-    print("INTERACTIVE MODE - Type 'quit' to exit")
+    print("インタラクティブモード - 'quit'と入力して終了")
     if verbose:
-        print("VERBOSE MODE ENABLED - Will show token generation")
+        print("詳細モード有効 - トークン生成を表示")
     if show_reasoning:
-        print("REASONING MODE ENABLED - Will show thinking process")
+        print("推論モード有効 - 思考プロセスを表示")
     print("="*60)
     
     while True:
-        prompt = input("\nEnter your prompt: ")
+        prompt = input("\nプロンプトを入力してください: ")
         if prompt.lower() in ['quit', 'exit', 'q']:
-            print("Goodbye!")
+            print("さようなら！")
             break
         
         generate_response(model, tokenizer, prompt, max_tokens=200, verbose=verbose, show_reasoning=show_reasoning)
 
 def main():
-    parser = argparse.ArgumentParser(description="Test GPT-OSS-20B with LoRA adapter")
+    parser = argparse.ArgumentParser(description="LoRAアダプター付きGemma-3-270m-itをテスト")
     parser.add_argument("--base-model", type=str, 
-                      default="lmstudio-community/gpt-oss-20b-MLX-8bit",
-                      help="Base model path")
+                      default="lmstudio-community/gemma-3-270m-it-MLX-8bit",
+                      help="ベースモデルパス")
     parser.add_argument("--adapter-path", type=str,
                       default=None,
-                      help="Path to LoRA adapter (optional)")
+                      help="LoRAアダプターパス (オプション)")
     parser.add_argument("--interactive", action="store_true",
-                      help="Run in interactive mode")
+                      help="インタラクティブモードで実行")
     parser.add_argument("--test-all", action="store_true",
-                      help="Test with all TechNavi prompts")
+                      help="すべてのTechNaviプロンプトでテスト")
     parser.add_argument("--prompt", type=str,
-                      help="Single prompt to test")
+                      help="テストする単一のプロンプト")
     parser.add_argument("--max-tokens", type=int, default=200,
-                      help="Maximum tokens to generate")
+                      help="生成する最大トークン数")
     parser.add_argument("--verbose", "-v", action="store_true",
-                      help="Show token-by-token generation (verbose mode)")
+                      help="トークンごとの生成を表示 (詳細モード)")
     parser.add_argument("--no-reasoning", action="store_true",
-                      help="Disable showing reasoning/thinking process")
+                      help="推論/思考プロセスの表示を無効化")
     
     args = parser.parse_args()
     show_reasoning = not args.no_reasoning
@@ -131,7 +136,7 @@ def main():
         generate_response(model, tokenizer, args.prompt, 
                         args.max_tokens, verbose=args.verbose, show_reasoning=show_reasoning)
     else:
-        print("Testing with a sample prompt...")
+        print("サンプルプロンプトでテスト中...")
         generate_response(model, tokenizer, 
                         "What is TechNavi?",
                         args.max_tokens, verbose=args.verbose, show_reasoning=show_reasoning)

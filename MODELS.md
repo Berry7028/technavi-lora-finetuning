@@ -1,31 +1,70 @@
-# Model Information
+# モデル情報
 
-## Pre-trained Model
+## 現在のモデル: Gemma-3-270m-it-MLX-8bit
 
-The LoRA adapter files are excluded from this repository due to size (35MB).
+### モデル詳細
+- **名前**: `lmstudio-community/gemma-3-270m-it-MLX-8bit`
+- **サイズ**: 270Mパラメータ
+- **タイプ**: 指示調整済み言語モデル
+- **量子化**: 8-bit
+- **フレームワーク**: MLX (Apple Silicon最適化)
+- **ライセンス**: Gemmaライセンス (Google)
 
-To use this project:
+### なぜGemma-3-270m-itなのか？
+- **効率性**: 小さいモデルサイズにより高速なトレーニングと推論が可能
+- **品質**: タスク性能向上のための指示調整済み
+- **Apple Silicon**: MLXフレームワークに最適化
+- **アクセシビリティ**: コンシューマーMacハードウェアで良好に動作
 
-1. Run the training script to generate your own adapter:
-   ```bash
-   ./04_run_lora_training.sh
-   ```
+### トレーニング設定
+- **手法**: LoRA (Low-Rank Adaptation)
+- **学習率**: 1e-4
+- **バッチサイズ**: 1 (勾配蓄積付き)
+- **最大シーケンス長**: 512トークン
+- **LoRA層数**: 8
+- **トレーニング回数**: 200
 
-2. Or download pre-trained adapters from:
-   - [Add your model hosting URL here]
+### 性能期待値
+- **トレーニング時間**: M1/M2/M3 Macで10-30分
+- **メモリ使用量**: トレーニング中に約2-4GB
+- **推論速度**: Apple Siliconで高速
+- **モデルサイズ**: 約100MB LoRAアダプター
 
-## Model Details
+### プロンプトフォーマット
+Gemma-3は特定のプロンプトフォーマットを使用:
+```
+<start_of_turn>user
+{user_message}<end_of_turn>
+<start_of_turn>model
+{model_response}
+```
 
-- **Base Model**: lmstudio-community/gpt-oss-20b-MLX-8bit
-- **LoRA Adapter Size**: ~35MB
-- **Training Data**: 52 TechNavi YouTube channel examples
-- **Training Time**: ~15 minutes on Apple Silicon
-- **Performance**: 87% loss reduction
+### 使用例
+- **TechNavi知識**: TechNavi YouTubeチャンネルに関する専門的な応答
+- **ML/AIチュートリアル**: 技術的な説明とガイダンス
+- **Apple Silicon**: MLXとMetal最適化のアドバイス
+- **ローカルAI**: プライバシー重視のAIアプリケーション
 
-## Files Generated
+## 代替モデル
 
-After training, you'll have:
-- `gpt_oss_lora_adapter/` - The fine-tuned LoRA weights
-- Various checkpoint files during training
+### より大きなモデル用
+- `lmstudio-community/gpt-oss-20b-MLX-8bit` (20Bパラメータ)
+- `lmstudio-community/llama-3.1-8b-instruct-MLX-8bit` (8Bパラメータ)
 
-These files are automatically excluded from git via `.gitignore`.
+### より小さなモデル用
+- `lmstudio-community/phi-3-mini-4k-instruct-MLX-8bit` (3.8Bパラメータ)
+- `lmstudio-community/qwen2.5-1.5b-instruct-MLX-8bit` (1.5Bパラメータ)
+
+## モデル選択ガイド
+
+### Gemma-3-270m-itを選択する場合:
+- 高速なトレーニングと推論が必要
+- 限られたハードウェアリソースで作業
+- 迅速な実験が必要
+- 特定のドメイン知識に焦点
+
+### より大きなモデルを選択する場合:
+- より高品質な応答が必要
+- 強力なハードウェア (M3 Max/Ultra) を持っている
+- 複雑な推論タスクに取り組んでいる
+- より長いトレーニング時間を許容できる
